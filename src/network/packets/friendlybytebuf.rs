@@ -1,5 +1,7 @@
 use crate::util;
 use crate::registry::identifier::Identifier;
+use crate::inventory::itemstack::ItemStack;
+use crate::registry::items;
 
 pub struct FriendlyByteBuf {
 	bytes: Vec<u8>,
@@ -46,6 +48,16 @@ impl FriendlyByteBuf {
 	}
 	pub fn write_identifier(&mut self, value: Identifier) {
 		self.write_string(&value.to_string());
+	}
+	pub fn write_itemstack(&mut self, value: &ItemStack) {
+		if value.get_amount() == 0 || value.get_item() == items::get(items::AIR).unwrap() {
+			self.write_boolean(false);
+			return;
+		}
+		self.write_boolean(true);
+		self.write_varint(value.get_item().get_id());
+		self.write_byte(value.get_amount() as u8);
+		self.write_byte(0);
 	}
 	pub fn read_byte(&mut self) -> u8 {
 		self.pointer += 1;

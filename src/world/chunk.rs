@@ -1,4 +1,4 @@
-use crate::world::block::Block;
+use crate::registry::blocks::Block;
 
 pub struct Chunk {
 	blocks: [Block; 65536]

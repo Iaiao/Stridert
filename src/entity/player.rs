@@ -1,6 +1,6 @@
 use crate::network::connection::Connection;
 use crate::entity::entity::{Entity, EntityType};
-use crate::registry::gamemode::GameMode;
+use crate::registry::gamemodes::GameMode;
 use std::sync::{Arc, Mutex};
 
 pub struct Player {

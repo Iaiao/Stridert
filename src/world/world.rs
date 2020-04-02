@@ -1,8 +1,7 @@
 use crate::world::chunk::Chunk;
-use crate::registry::dimension::Dimension;
 use crate::entity::entity::Entity;
 use crate::entity::player::Player;
-use crate::registry::{leveltype::LevelType, difficulty::Difficulty};
+use crate::registry::{dimensions::Dimension, leveltypes::LevelType, difficulties::Difficulty};
 use std::sync::{Arc, Mutex};
 
 pub struct World {

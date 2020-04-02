@@ -1,5 +1,5 @@
 use crate::network::packets::{friendlybytebuf::FriendlyByteBuf, packet::{Packet, ClientboundPacket}};
-use crate::registry::difficulty::Difficulty;
+use crate::registry::difficulties::Difficulty;
 
 pub struct ClientboundServerDifficultyPacket {
 	difficulty: Difficulty,

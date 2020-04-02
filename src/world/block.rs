@@ -1,6 +1,4 @@
-pub enum Block {
-	STONE
-}
+use crate::registry::blocks::Block;
 
 impl Block {
 	pub fn is_solid (&self) -> bool {true }

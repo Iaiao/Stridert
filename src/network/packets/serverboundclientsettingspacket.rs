@@ -1,6 +1,7 @@
 use crate::network::packets::{self, packet::{Packet, ServerboundPacket}, friendlybytebuf::FriendlyByteBuf};
-use crate::registry::{chatmode::ChatMode, hand::Hand};
+use crate::registry::{chatmodes::ChatMode, hands::Hand};
 use crate::network::connection::Connection;
+use crate::SERVER;
 
 pub struct ServerboundClientSettingsPacket {
 	locale: String,
@@ -51,5 +52,6 @@ impl ServerboundPacket for ServerboundClientSettingsPacket {
 impl ServerboundClientSettingsPacket {
 	pub fn handle(&self, connection: &mut Connection) {
 		connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
+		connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
 	}
 }

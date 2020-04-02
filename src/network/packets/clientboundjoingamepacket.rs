@@ -1,7 +1,7 @@
-use crate::registry::gamemode::GameMode;
-use crate::registry::leveltype::LevelType;
+use crate::registry::gamemodes::GameMode;
+use crate::registry::leveltypes::LevelType;
 use crate::network::packets::{friendlybytebuf, packet::{ClientboundPacket, Packet}};
-use crate::registry::dimension::Dimension;
+use crate::registry::dimensions::Dimension;
 
 use sha2::{Sha256, Digest};
 

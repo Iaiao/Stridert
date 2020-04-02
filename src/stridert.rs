@@ -1,9 +1,11 @@
 use crate::entity::player::Player;
 use crate::world::world::World;
 use crate::config;
-use crate::registry::{dimension::Dimension, difficulty::Difficulty, identifier::Identifier};
-use std::sync::{Arc, Mutex};
+use crate::registry::{dimensions::Dimension, difficulties::Difficulty, identifier::Identifier};
 use crate::network::{self, packets};
+use crate::inventory::recipe::Recipe;
+use crate::registry::recipes;
+use std::sync::{Arc, Mutex};
 
 pub struct Stridert {
 	mod_name: String,
@@ -12,7 +14,8 @@ pub struct Stridert {
 	icon: String,
 	worlds: Vec<Arc<Mutex<World>>>,
 	max_players: usize,
-	view_distance: u8
+	view_distance: u8,
+	recipes: Vec<Recipe>
 }
 
 impl Stridert {
@@ -21,7 +24,7 @@ impl Stridert {
 		let mut buf: Vec<u8> = Vec::new();
 		let _ = img.write_to(&mut buf, image::ImageOutputFormat::Png);
 		let icon = base64::encode(&buf);
-		return Stridert {
+		let mut server = Stridert {
 			mod_name: String::from("stridert"),
 			version: String::from(config::VERSION),
 			protocol: 709,
@@ -47,8 +50,11 @@ impl Stridert {
 				)))
 			),
 			max_players: config::MAX_PLAYERS,
-			view_distance: config::VIEW_DISTANCE
-		}
+			view_distance: config::VIEW_DISTANCE,
+			recipes: Vec::new()
+		};
+		recipes::fill_recipes(&mut server.recipes);
+		return server;
 	}
 	pub fn get_worlds(&self) -> &Vec<Arc<Mutex<World>>> { &self.worlds }
 	pub fn get_mod_name(&self) -> String { self.mod_name.clone() }
@@ -119,4 +125,6 @@ impl Stridert {
 			i += 1;
 		}
 	}
+	pub fn get_recipes(&self) -> Vec<Recipe> { self.recipes.clone() }
+	pub fn register_recipe(&mut self, recipe: Recipe) { self.recipes.push(recipe) }
 }
