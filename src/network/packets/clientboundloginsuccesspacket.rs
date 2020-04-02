@@ -27,7 +27,7 @@ impl ClientboundLoginSuccessPacket {
 	pub fn new(username: String, uuid: &util::uuid::UUID) -> ClientboundLoginSuccessPacket {
 		return ClientboundLoginSuccessPacket {
 			username: username.clone(),
-			uuid: util::uuid::encode(uuid)
+			uuid: util::uuid::UUID::encode(uuid)
 		}
 	}
 }
