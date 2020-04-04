@@ -11,3 +11,4 @@ pub mod items;
 pub mod recipetypes;
 pub mod fluids;
 pub mod entitytypes;
+pub mod entitystatuses;
