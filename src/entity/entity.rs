@@ -1,17 +1,13 @@
 use crate::stridert::Stridert;
 use std::sync::{Arc, Mutex};
 use crate::util::uuid;
+use crate::registry::entitytypes::EntityType;
 
 pub struct Entity {
 	id: i32,
 	uuid: uuid::UUID,
 	entity_type: EntityType,
 	position: (f64, f64, f64)
-}
-
-#[derive(Copy, Clone)]
-pub enum EntityType {
-	PLAYER
 }
 
 impl Entity {

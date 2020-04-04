@@ -14,3 +14,4 @@ pub mod clientboundserverdifficultypacket;
 pub mod serverboundclientsettingspacket;
 pub mod clientboundhelditemchangepacket;
 pub mod clientbounddeclarerecipespacket;
+pub mod clientboundtagspacket;

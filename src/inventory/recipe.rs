@@ -20,12 +20,12 @@ impl Recipe {
 	pub fn write(&self, buf: &mut FriendlyByteBuf) {
 
 		match &self.recipe_type {
-			RecipeType::SHAPELESS(data) => {
+			RecipeType::Shapeless(data) => {
 				buf.write_string(&String::from("crafting_shapeless"));
 
 				buf.write_identifier(self.id.clone());
 
-				buf.write_identifier(data.get_group().get_identifier());
+				buf.write_identifier(data.get_group().get_namespaced_id());
 
 				buf.write_varint(data.get_ingredients().len() as i32);
 

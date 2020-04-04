@@ -9,3 +9,5 @@ pub mod blocks;
 pub mod recipes;
 pub mod items;
 pub mod recipetypes;
+pub mod fluids;
+pub mod entitytypes;

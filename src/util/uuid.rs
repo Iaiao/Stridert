@@ -1,6 +1,4 @@
-use rand::{thread_rng, RngCore}; 
-
-pub const SERIAL_VERSION_UID : i64 = -4856846361193249489;
+use rand::{thread_rng, RngCore};
 
 pub struct UUID {
     most_sig_bits  : i64,

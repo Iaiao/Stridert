@@ -10,7 +10,7 @@ pub struct World {
 	seed       : i64,
 	level_type : LevelType,
 	hardcore   : bool,
-	chunks     : Vec<Arc<Mutex<Chunk>>>,
+	chunks     : Vec<Chunk>,
 	entities   : Vec<Entity>,
 	players    : Vec<Arc<Mutex<Player>>>,
 	difficulty : Difficulty
@@ -22,7 +22,7 @@ impl World {
 			name,
 			dimension,
 			seed,
-			level_type : LevelType::DEFAULT,
+			level_type : LevelType::Default,
 			hardcore   : false,
 			chunks     : Vec::new(),
 			entities   : Vec::new(),

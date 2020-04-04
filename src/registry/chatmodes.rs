@@ -1,5 +1,5 @@
 pub enum ChatMode {
-	ENABLED,
-	COMMANDSONLY,
-	HIDDEN
+	Enabled,
+	CommandsOnly,
+	Hidden
 }

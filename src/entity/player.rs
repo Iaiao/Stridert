@@ -1,5 +1,6 @@
 use crate::network::connection::Connection;
-use crate::entity::entity::{Entity, EntityType};
+use crate::entity::entity::Entity;
+use crate::registry::entitytypes::EntityType;
 use crate::registry::gamemodes::GameMode;
 use std::sync::{Arc, Mutex};
 
@@ -14,7 +15,7 @@ pub struct Player {
 
 impl Player {
 	pub fn new(name: String, connection: Connection) -> Player {
-		let entity = Entity::new(EntityType::PLAYER, connection.server.clone(), 0.0, 0.0, 0.0);
+		let entity = Entity::new(EntityType::Player, connection.server.clone(), 0.0, 0.0, 0.0);
 		let conn = Arc::new(Mutex::new(connection));
 		return Player {
 			name,

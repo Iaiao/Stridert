@@ -32,21 +32,21 @@ impl Stridert {
 			worlds: vec!(
 				Arc::new(Mutex::new(World::new(
 					String::from("world"),
-					Dimension::OVERWORLD,
+					Dimension::Overworld,
 					0,
-					Difficulty::EASY
+					Difficulty::Easy
 				))),
 				Arc::new(Mutex::new(World::new(
 					String::from("world"),
-					Dimension::NETHER,
+					Dimension::Nether,
 					0,
-					Difficulty::EASY
+					Difficulty::Easy
 				))),
 				Arc::new(Mutex::new(World::new(
 					String::from("world"),
-					Dimension::END,
+					Dimension::TheEnd,
 					0,
-					Difficulty::EASY
+					Difficulty::Easy
 				)))
 			),
 			max_players: config::MAX_PLAYERS,

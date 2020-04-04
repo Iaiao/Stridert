@@ -21,9 +21,9 @@ impl ServerboundPacket for ServerboundClientSettingsPacket {
 		let locale = buf.read_string();
 		let view_distance = buf.read_byte();
 		let chat_mode = match buf.read_varint() {
-			1 => ChatMode::COMMANDSONLY,
-			2 => ChatMode::HIDDEN,
-			_ => ChatMode::ENABLED
+			1 => ChatMode::CommandsOnly,
+			2 => ChatMode::Hidden,
+			_ => ChatMode::Enabled
 		};
 		let chat_colors = buf.read_boolean();
 		let skin_parts = buf.read_byte();
@@ -35,8 +35,8 @@ impl ServerboundPacket for ServerboundClientSettingsPacket {
 		let _right_pants_leg = skin_parts & 0b00100000 != 0;
 		let _hat = skin_parts & 0b01000000 != 0;
 		let main_hand = match buf.read_varint() {
-			0 => Hand::LEFT,
-			_ => Hand::RIGHT
+			0 => Hand::Left,
+			_ => Hand::Right
 		};
 		return ServerboundClientSettingsPacket {
 			locale,
@@ -53,5 +53,6 @@ impl ServerboundClientSettingsPacket {
 	pub fn handle(&self, connection: &mut Connection) {
 		connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
 		connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
+		connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
 	}
 }

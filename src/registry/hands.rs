@@ -1,4 +1,4 @@
 pub enum Hand {
-	LEFT,
-	RIGHT
+	Left,
+	Right
 }

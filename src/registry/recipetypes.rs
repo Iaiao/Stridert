@@ -2,7 +2,7 @@ use crate::inventory::{item::Item, itemstack::ItemStack};
 
 #[derive(Clone)]
 pub enum RecipeType {
-	SHAPELESS(RecipeShapeless)
+	Shapeless(RecipeShapeless)
 }
 
 #[derive(Clone)]

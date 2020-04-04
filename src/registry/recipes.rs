@@ -5,7 +5,7 @@ pub fn fill_recipes(recipes: &mut Vec<Recipe>) {
 	recipes.append(&mut vec!(
 		Recipe::new(
 			Identifier::from_string("minecraft:oak_planks"),
-			RecipeType::SHAPELESS(RecipeShapeless::new(
+			RecipeType::Shapeless(RecipeShapeless::new(
 				items::get(items::OAK_PLANKS).unwrap(),
 				vec!(
 					vec!(

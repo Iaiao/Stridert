@@ -39,9 +39,9 @@ impl ClientboundPacket for ClientboundJoinGamePacket {
 		buf.write_byte(if self.hardcore { a | 0b00000100 } else { a });
 
 		buf.write_int(match self.dimension {
-			Dimension::NETHER => -1,
-			Dimension::OVERWORLD => 0,
-			Dimension::END => 1
+			Dimension::Nether => -1,
+			Dimension::Overworld => 0,
+			Dimension::TheEnd => 1
 		});
 
 		let mut hasher = Sha256::new();
@@ -50,17 +50,7 @@ impl ClientboundPacket for ClientboundJoinGamePacket {
 
 		buf.write_byte(self.max_players);
 
-		buf.write_string(&String::from(
-			match self.level_type {
-				LevelType::AMPLIFIED => "amplified",
-				LevelType::BUFFET => "buffet",
-				LevelType::CUSTOMIZED => "customized",
-				LevelType::DEFAULT => "default",
-				LevelType::DEFAULT1_1 => "default_1_1",
-				LevelType::FLAT => "flat",
-				LevelType::LARGEBIOMES => "latge_biomes"
-			}
-		));
+		buf.write_string(&self.level_type.to_string());
 
 		buf.write_varint(self.view_distance);
 

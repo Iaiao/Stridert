@@ -15,10 +15,10 @@ impl ClientboundPacket for ClientboundServerDifficultyPacket {
 		let mut buf = FriendlyByteBuf::new();
 		buf.write_varint(ClientboundServerDifficultyPacket::ID);
 		buf.write_byte(match self.difficulty {
-			Difficulty::PEACEFUL => 0,
-			Difficulty::EASY => 1,
-			Difficulty::NORMAL => 2,
-			Difficulty::HARD => 3
+			Difficulty::Peaceful => 0,
+			Difficulty::Easy => 1,
+			Difficulty::Normal => 2,
+			Difficulty::Hard => 3
 		});
 		buf.write_boolean(self.locked);
 		return buf.to_bytes();
