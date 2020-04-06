@@ -58,5 +58,6 @@ impl ServerboundClientSettingsPacket {
 		connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
 		connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
 		connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
+		connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(packets::clientboundunlockrecipespacket::Action::INIT, true, true, true, true, (*SERVER).lock().unwrap().get_recipes(), Option::from((*SERVER).lock().unwrap().get_recipes())));
 	}
 }

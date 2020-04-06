@@ -41,4 +41,5 @@ impl Recipe {
 			}
 		}
 	}
+	pub fn get_id(&self) -> Identifier { self.id.clone() }
 }
