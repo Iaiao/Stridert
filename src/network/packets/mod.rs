@@ -16,3 +16,4 @@ pub mod clientboundhelditemchangepacket;
 pub mod clientbounddeclarerecipespacket;
 pub mod clientboundtagspacket;
 pub mod clientboundentitystatuspacket;
+pub mod clientbounddeclarecommandspacket;
