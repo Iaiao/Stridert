@@ -23,46 +23,23 @@ impl ClientboundPacket for ClientboundResponsePacket {
 
 impl ClientboundResponsePacket {
 	pub fn new(server: Arc<Mutex<Stridert>>) -> ClientboundResponsePacket {
-		let guard = server.lock().unwrap();
+		let server = server.lock().unwrap();
 		return ClientboundResponsePacket {
 			response: json!({
 				"version": {
-					"name": guard.get_version(),
-					"protocol": guard.get_protocol()
+					"name": server.get_version(),
+					"protocol": server.get_protocol()
 				},
 				"players": {
-					"max": guard.get_max_players(),
-					"online": guard.get_player_count()
+					"max": server.get_max_players(),
+					"online": server.get_player_count()
 	//				"sample": []
 				},
 				"description": {
 					"text": config::MOTD
 				},
-				"favicon": guard.get_icon()
+				"favicon": server.get_icon()
 			}).to_string()
 		}
 	}
 }
-
-/*
-"{{
-	\"version\": {
-		\"name\": \"{}\",
-		\"protocol\": {}
-	},
-	\"players\": {
-		\"max\": {},
-		\"online\": {},
-		\"sample\": [
-			{
-				\"name\": \"Iaiao\",
-				\"id\": \"d3a2c755-6fdd-4108-a507-4cb18ffa5e8b\"
-			}
-		]
-	},
-	\"description\": {
-		\"text\": \"Hello world\"
-	},
-	\"favicon\": \"<data>\"
-}"
-*/

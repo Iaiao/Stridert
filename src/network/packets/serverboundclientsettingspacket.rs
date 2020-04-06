@@ -1,6 +1,6 @@
 use crate::network::packets::{self, packet::{Packet, ServerboundPacket}, friendlybytebuf::FriendlyByteBuf};
 use crate::registry::{chatmodes::ChatMode, hands::Hand};
-use crate::network::connection::Connection;
+use crate::entity::player::Player;
 use crate::SERVER;
 use crate::registry::entitystatuses;
 
@@ -51,13 +51,15 @@ impl ServerboundPacket for ServerboundClientSettingsPacket {
 }
 
 impl ServerboundClientSettingsPacket {
-	pub fn handle(&self, connection: &mut Connection) {
-		let entity_id = (*SERVER).lock().unwrap().get_player(connection.username.clone()).unwrap().lock().unwrap().get_entity().get_id();
+	pub fn handle(&self, player: &mut Player) {
+		let mut connection = player.connection.lock().unwrap();
+		let entity_id = player.get_entity().get_id();
 		connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
 		connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
 		connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
 		connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
 		connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
-		connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(packets::clientboundunlockrecipespacket::Action::INIT, true, true, true, true, (*SERVER).lock().unwrap().get_recipes(), Option::from((*SERVER).lock().unwrap().get_recipes())));
+		let recipes = (*SERVER).lock().unwrap().get_recipes();
+		connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(packets::clientboundunlockrecipespacket::Action::INIT, true, true, true, true, recipes.clone(), Option::from(recipes)));
 	}
 }

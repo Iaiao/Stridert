@@ -16,8 +16,8 @@ impl ServerboundPacket for ServerboundHandshakePacket {
 	fn deserialize(buf: &mut friendlybytebuf::FriendlyByteBuf) -> ServerboundHandshakePacket {
 		// Следующее состояние
 		let protocol = buf.read_varint();
-		let ip = buf.read_string();
-		let port = buf.read_ushort();
+		let _ip = buf.read_string();
+		let _port = buf.read_ushort();
 		let next_state = match buf.read_varint() {
 			1 => states::State::STATUS,
 			2 => states::State::LOGIN,
@@ -25,7 +25,6 @@ impl ServerboundPacket for ServerboundHandshakePacket {
 			_ => states::State::HANDSHAKING
 		};
 		let valid = next_state != states::State::HANDSHAKING;
-		dbg!(protocol, ip, port);
 		return ServerboundHandshakePacket {
 			next_state,
 			protocol,

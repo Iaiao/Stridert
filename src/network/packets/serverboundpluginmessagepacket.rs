@@ -23,7 +23,7 @@ impl ServerboundPacket for ServerboundPluginMessagePacket {
 }
 
 impl ServerboundPluginMessagePacket {
-	pub fn handle(&self, _connection: &mut connection::Connection) {
+	pub fn handle(&self) {
 		match self.identifier.to_string().as_str() {
 			"minecraft:brand" => {
 				let _brand = friendlybytebuf::FriendlyByteBuf::from(self.data.clone()).read_string();

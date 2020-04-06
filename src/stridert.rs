@@ -130,7 +130,7 @@ impl Stridert {
 		for world in &self.worlds {
 			match world.lock().unwrap().get_player(name) {
 				Some(p) => return Some(p),
-				None => {}
+				_ => {}
 			}
 		}
 		return None
