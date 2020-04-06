@@ -36,6 +36,9 @@ impl FriendlyByteBuf {
 	pub fn write_float(&mut self, value: f32) {
 		self.bytes.append(&mut value.to_be_bytes().to_vec());
 	}
+	pub fn write_double(&mut self, value: f64) {
+		self.bytes.append(&mut value.to_be_bytes().to_vec());
+	}
 	pub fn write_bytes(&mut self, value: &mut Vec<u8>) {
 		self.bytes.append(value)
 	}

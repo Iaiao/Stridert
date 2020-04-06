@@ -8,7 +8,11 @@ pub fn start(player: Arc<Mutex<Player>>) {
 	thread::spawn(move || {
 		let mut l = [0; 1];
 		loop {
-			match player.lock().unwrap().connection.lock().unwrap().stream.read(&mut l) {
+			let res;
+			{
+				res = player.lock().unwrap().connection.lock().unwrap().stream.read(&mut l);
+			}
+			match res {
 				Ok(size) => {
 					if size == 0 {
 						break
@@ -16,7 +20,11 @@ pub fn start(player: Arc<Mutex<Player>>) {
 					if size > 0 {
 						let length = l[0];
 						let mut bytes = vec![0; length as usize];
-						player.lock().unwrap().connection.lock().unwrap().stream.read(&mut bytes).unwrap();
+						{
+							let player = player.lock().unwrap();
+							let mut connection = player.connection.lock().unwrap();
+							connection.stream.read(&mut bytes).unwrap();
+						}
 						let mut buf = friendlybytebuf::FriendlyByteBuf::from(bytes);
 						let pid = buf.read_varint();
 						handle(player.clone(), &mut buf, pid);
@@ -45,7 +53,6 @@ fn handle(player: Arc<Mutex<Player>>, buf: &mut friendlybytebuf::FriendlyByteBuf
 				player.set_view_distance(if packet.view_distance >= 4 { packet.view_distance } else { 4 });
 			}
 			packet.handle(&mut player);
-			(*crate::SERVER).try_lock().unwrap();
 		}
 		_ => {}
 	}

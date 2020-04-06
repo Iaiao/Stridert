@@ -15,7 +15,7 @@ pub struct Player {
 
 impl Player {
 	pub fn new(name: String, connection: Connection) -> Player {
-		let entity = Entity::new(EntityType::Player, connection.server.clone(), 0.0, 0.0, 0.0);
+		let entity = Entity::new(EntityType::Player, connection.server.clone(), 0.0, 0.0, 0.0, 0.0, 0.0);
 		let conn = Arc::new(Mutex::new(connection));
 		return Player {
 			name,
@@ -38,4 +38,11 @@ impl PartialEq<Player> for Player {
 	fn eq(&self, other: &Player) -> bool {
 		return self.name == other.name
 	}
+}
+
+impl std::ops::Deref for Player {
+    type Target = Entity;
+    fn deref(&self) -> &Entity {
+        &self.entity
+    }
 }

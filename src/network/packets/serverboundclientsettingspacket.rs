@@ -60,6 +60,26 @@ impl ServerboundClientSettingsPacket {
 		connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
 		connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
 		let recipes = (*SERVER).lock().unwrap().get_recipes();
-		connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(packets::clientboundunlockrecipespacket::Action::INIT, true, true, true, true, recipes.clone(), Option::from(recipes)));
+		connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(
+			packets::clientboundunlockrecipespacket::Action::INIT,
+			true,
+			true,
+			true,
+			true,
+			recipes.clone(),
+			Option::from(recipes)
+		));
+		connection.send(&packets::clientboundplayerpositionandlookpacket::ClientboundPlayerPositionPacket::new(
+			player.get_x(),
+			player.get_y(),
+			player.get_z(),
+			player.get_yaw(),
+			player.get_pitch(),
+			false,
+			false,
+			false,
+			false,
+			false
+		));
 	}
 }

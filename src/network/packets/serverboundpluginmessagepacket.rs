@@ -1,4 +1,3 @@
-use crate::network::connection;
 use crate::network::packets::{packet::*, friendlybytebuf};
 use crate::registry::identifier::Identifier;
 
