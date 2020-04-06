@@ -125,6 +125,16 @@ impl Stridert {
 			i += 1;
 		}
 	}
+	pub fn get_player<S: AsRef<str>>(&self, name: S) -> Option<Arc<Mutex<Player>>> {
+		let name = name.as_ref();
+		for world in &self.worlds {
+			match world.lock().unwrap().get_player(name) {
+				Some(p) => return Some(p),
+				None => {}
+			}
+		}
+		return None
+	}
 	pub fn get_recipes(&self) -> Vec<Recipe> { self.recipes.clone() }
 	pub fn register_recipe(&mut self, recipe: Recipe) { self.recipes.push(recipe) }
 }

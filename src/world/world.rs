@@ -39,4 +39,13 @@ impl World {
 	pub fn get_dimension(&self) -> Dimension { self.dimension }
 	pub fn get_seed(&self) -> i64 { self.seed }
 	pub fn get_difficulty(&self) -> Difficulty { self.difficulty }
+	pub fn get_player<S: AsRef<str>>(&self, name: S) -> Option<Arc<Mutex<Player>>> {
+		let name = name.as_ref();
+		for player in &self.players {
+			if player.lock().unwrap().get_name() == name {
+				return Some(player.clone())
+			}
+		}
+		return None
+	}
 }
