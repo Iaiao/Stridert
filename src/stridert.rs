@@ -5,6 +5,7 @@ use crate::registry::{dimensions::Dimension, difficulties::Difficulty, identifie
 use crate::network::{self, packets};
 use crate::inventory::recipe::Recipe;
 use crate::registry::recipes;
+use std::fs;
 use std::sync::{Arc, Mutex};
 
 pub struct Stridert {
@@ -20,10 +21,8 @@ pub struct Stridert {
 
 impl Stridert {
 	pub fn new() -> Stridert {
-		let img: image::DynamicImage = image::open("server-icon.png").unwrap();
-		let mut buf: Vec<u8> = Vec::new();
-		let _ = img.write_to(&mut buf, image::ImageOutputFormat::Png);
-		let icon = base64::encode(&buf);
+		let buf = fs::read("server-icon.png");
+		let icon = format!("data:image/png;base64,{}", base64::encode(&buf.as_ref().unwrap()));
 		let mut server = Stridert {
 			mod_name: String::from("stridert"),
 			version: String::from(config::VERSION),
