@@ -3,23 +3,21 @@ use std::io::{Read, Write};
 use std::thread;
 use std::sync::{Arc, Mutex};
 
-use crate::{network, stridert::Stridert};
+use crate::network;
 use crate::network::packets::{self, friendlybytebuf, packet::{ServerboundPacket, ClientboundPacket}};
 use crate::entity::player::Player;
 
 pub struct Connection {
 	pub stream   : TcpStream,
 	pub state    : network::states::State,
-	pub server   : Arc<Mutex<Stridert>>,
 	pub protocol : i32,
 	pub username : String
 }
 
-pub fn handle(stream: TcpStream, server: Arc<Mutex<Stridert>>) {
+pub fn handle(stream: TcpStream) {
 	let mut conn = Connection {
 		stream,
 		state: network::states::State::HANDSHAKING,
-		server: server.clone(),
 		protocol: -1,
 		username: String::from("")
 	};
@@ -38,7 +36,7 @@ pub fn handle(stream: TcpStream, server: Arc<Mutex<Stridert>>) {
 						let mut buf = friendlybytebuf::FriendlyByteBuf::from(bytes);
 						conn.handle_incoming(&mut buf);
 						if conn.state == network::states::State::PLAY {
-							let server = conn.server.clone();
+							let server = (*crate::SERVER).clone();
 							let player = Player::new(conn.username.clone(), conn);
 							server.lock().unwrap().add_player(player);
 							break
@@ -97,5 +95,8 @@ impl Connection {
 			}
 			_ => {}
 		}
+	}
+	pub fn get_player(&self) -> Option<Arc<Mutex<Player>>> {
+		return (*crate::SERVER).lock().unwrap().get_player(&self.username);
 	}
 }

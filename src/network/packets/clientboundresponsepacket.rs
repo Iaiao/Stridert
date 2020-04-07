@@ -1,7 +1,5 @@
 use crate::network::packets::{friendlybytebuf, packet::*};
-use crate::stridert::Stridert;
 use crate::config;
-use std::sync::{Arc, Mutex};
 use serde_json::json;
 
 pub struct ClientboundResponsePacket {
@@ -22,8 +20,8 @@ impl ClientboundPacket for ClientboundResponsePacket {
 }
 
 impl ClientboundResponsePacket {
-	pub fn new(server: Arc<Mutex<Stridert>>) -> ClientboundResponsePacket {
-		let server = server.lock().unwrap();
+	pub fn new() -> ClientboundResponsePacket {
+		let server = (*crate::SERVER).lock().unwrap();
 		return ClientboundResponsePacket {
 			response: json!({
 				"version": {

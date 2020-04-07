@@ -3,6 +3,7 @@ use crate::registry::{chatmodes::ChatMode, hands::Hand};
 use crate::entity::player::Player;
 use crate::SERVER;
 use crate::registry::entitystatuses;
+use std::sync::{Arc, Mutex};
 
 pub struct ServerboundClientSettingsPacket {
 	locale: String,
@@ -51,35 +52,54 @@ impl ServerboundPacket for ServerboundClientSettingsPacket {
 }
 
 impl ServerboundClientSettingsPacket {
-	pub fn handle(&self, player: &mut Player) {
-		let mut connection = player.connection.lock().unwrap();
-		let entity_id = player.get_entity().get_id();
-		connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
-		connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
-		connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
-		connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
-		connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
-		let recipes = (*SERVER).lock().unwrap().get_recipes();
-		connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(
-			packets::clientboundunlockrecipespacket::Action::INIT,
-			true,
-			true,
-			true,
-			true,
-			recipes.clone(),
-			Option::from(recipes)
-		));
-		connection.send(&packets::clientboundplayerpositionandlookpacket::ClientboundPlayerPositionPacket::new(
-			player.get_x(),
-			player.get_y(),
-			player.get_z(),
-			player.get_yaw(),
-			player.get_pitch(),
-			false,
-			false,
-			false,
-			false,
-			false
+	pub fn handle(&self, player: Arc<Mutex<Player>>) {
+		{
+			let p = player.lock().unwrap();
+			let mut connection = p.connection.lock().unwrap();
+			let entity_id = p.get_entity().get_id();
+			connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
+			connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
+			connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
+			connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
+			connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
+			let recipes = (*SERVER).lock().unwrap().get_recipes();
+			connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(
+				packets::clientboundunlockrecipespacket::Action::Init,
+				true,
+				true,
+				true,
+				true,
+				recipes.clone(),
+				Option::from(recipes)
+			));
+			connection.send(&packets::clientboundplayerpositionandlookpacket::ClientboundPlayerPositionPacket::new(
+				p.get_x(),
+				p.get_y(),
+				p.get_z(),
+				p.get_yaw(),
+				p.get_pitch(),
+				false,
+				false,
+				false,
+				false,
+				false
+			));
+			let mut players = (*crate::SERVER).lock().unwrap().get_players();
+			players.retain(|p| {
+				match p.try_lock() {
+					Ok(_) => true,
+					_ => false
+				}
+			});
+
+			connection.send(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
+				packets::clientboundplayerinfopacket::Action::AddPlayer,
+				players
+			));
+		}
+		(*crate::SERVER).lock().unwrap().broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
+			packets::clientboundplayerinfopacket::Action::AddPlayer,
+			vec!(player)
 		));
 	}
 }

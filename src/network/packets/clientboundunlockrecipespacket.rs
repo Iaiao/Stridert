@@ -20,9 +20,9 @@ impl ClientboundPacket for ClientboundUnlockRecipesPacket {
 		let mut buf = FriendlyByteBuf::new();
 		buf.write_varint(ClientboundUnlockRecipesPacket::ID);
 		buf.write_varint(match self.action {
-			Action::INIT   => 0,
-			Action::ADD    => 1,
-			Action::REMOVE => 2
+			Action::Init   => 0,
+			Action::Add    => 1,
+			Action::Remove => 2
 		});
 		buf.write_boolean(self.open_crafting_recipe_book);
 		buf.write_boolean(self.filter_crafting_recipe_book);
@@ -32,7 +32,7 @@ impl ClientboundPacket for ClientboundUnlockRecipesPacket {
 		for recipe in &self.recipes {
 			buf.write_identifier(recipe.get_id());
 		}
-		if self.action == Action::INIT {
+		if self.action == Action::Init {
 			buf.write_varint((&self.init_recipes).as_ref().unwrap().len() as i32);
 			for recipe in (&self.init_recipes).as_ref().unwrap() {
 				buf.write_identifier(recipe.get_id());
@@ -66,7 +66,7 @@ impl ClientboundUnlockRecipesPacket {
 
 #[derive(PartialEq)]
 pub enum Action {
-	INIT,
-	ADD,
-	REMOVE
+	Init,
+	Add,
+	Remove
 }

@@ -1,3 +1,4 @@
+use crate::network::packets::packet::ClientboundPacket;
 use crate::entity::player::Player;
 use crate::world::world::World;
 use crate::config;
@@ -76,7 +77,7 @@ impl Stridert {
 		let mut conn = p.connection.lock().unwrap();
 		conn.send(&packets::clientboundloginsuccesspacket::ClientboundLoginSuccessPacket::new(
 			p.get_name(),
-			p.get_entity().get_uuid()
+			p.get_uuid()
 		));
 		println!("[+] {} присоединился к игре.", p.get_name());
 		conn.send(&packets::clientboundjoingamepacket::ClientboundJoinGamePacket::new(
@@ -96,17 +97,6 @@ impl Stridert {
 		conn.send(&packets::clientboundplayerabilitiespacket::ClientboundPlayerAbilitiesPacket::new(true, true, true, true, 0.05, 0.1));
 		world.add_player(player.clone());
 		network::packet_listener::start(player.clone());
-	}
-	pub fn get_player_world(&self, player: Arc<Mutex<Player>>) -> Option<Arc<Mutex<World>>> {
-		let player = player.lock().unwrap();
-		for world in &self.worlds {
-			for p in world.lock().unwrap().get_players() {
-				if *p.lock().unwrap() == *player {
-					return Some(world.clone())
-				}
-			}
-		};
-		None
 	}
 	pub fn free_eid(&self) -> i32 {
 		let mut ids = Vec::new();
@@ -134,6 +124,18 @@ impl Stridert {
 		}
 		return None
 	}
+	pub fn get_players(&self) -> Vec<Arc<Mutex<Player>>> {
+		let mut players = Vec::new();
+		for world in &self.worlds {
+			players.append(&mut world.lock().unwrap().get_players());
+		}
+		return players
+	}
 	pub fn get_recipes(&self) -> Vec<Recipe> { self.recipes.clone() }
 	pub fn register_recipe(&mut self, recipe: Recipe) { self.recipes.push(recipe) }
+	pub fn broadcast_packet(&self, packet: &dyn ClientboundPacket) {
+		for player in self.get_players() {
+			player.lock().unwrap().connection.lock().unwrap().send(packet);
+		}
+	}
 }

@@ -30,6 +30,9 @@ impl FriendlyByteBuf {
 	pub fn write_int(&mut self, value: i32) {
 		self.bytes.append(&mut value.to_be_bytes().to_vec());
 	}
+	pub fn write_uint(&mut self, value: u32) {
+		self.bytes.append(&mut value.to_be_bytes().to_vec());
+	}
 	pub fn write_long(&mut self, value: i64) {
 		self.bytes.append(&mut value.to_be_bytes().to_vec())
 	}

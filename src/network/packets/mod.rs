@@ -19,3 +19,4 @@ pub mod clientboundentitystatuspacket;
 pub mod clientbounddeclarecommandspacket;
 pub mod clientboundunlockrecipespacket;
 pub mod clientboundplayerpositionandlookpacket;
+pub mod clientboundplayerinfopacket;

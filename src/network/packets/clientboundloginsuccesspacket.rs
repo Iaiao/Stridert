@@ -2,7 +2,7 @@ use crate::network::packets::{packet::{ClientboundPacket, Packet}, friendlybyteb
 use crate::util;
 
 pub struct ClientboundLoginSuccessPacket {
-	uuid: [i32; 4],
+	uuid: util::uuid::UUID,
 	username: String 
 }
 
@@ -14,10 +14,9 @@ impl ClientboundPacket for ClientboundLoginSuccessPacket {
 	fn serialize(&self) -> Vec<u8> {
 		let mut buf = friendlybytebuf::FriendlyByteBuf::new();
 		buf.write_varint(ClientboundLoginSuccessPacket::ID);
-		buf.write_int(self.uuid[0]);
-		buf.write_int(self.uuid[1]);
-		buf.write_int(self.uuid[2]);
-		buf.write_int(self.uuid[3]);
+		for i in &util::uuid::encode(&self.uuid) {
+			buf.write_uint(*i);
+		}
 		buf.write_string(&self.username);
 		return buf.to_bytes()
 	}
@@ -27,7 +26,7 @@ impl ClientboundLoginSuccessPacket {
 	pub fn new(username: String, uuid: &util::uuid::UUID) -> ClientboundLoginSuccessPacket {
 		return ClientboundLoginSuccessPacket {
 			username: username.clone(),
-			uuid: util::uuid::UUID::encode(uuid)
+			uuid: uuid.clone()
 		}
 	}
 }

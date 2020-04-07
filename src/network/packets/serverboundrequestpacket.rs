@@ -16,7 +16,7 @@ impl ServerboundPacket for ServerboundRequestPacket {
 
 impl ServerboundRequestPacket {
 	pub fn handle(&self, connection: &mut connection::Connection) {
-		connection.send(&clientboundresponsepacket::ClientboundResponsePacket::new(connection.server.clone()));
+		connection.send(&clientboundresponsepacket::ClientboundResponsePacket::new());
 		connection.stream.flush().unwrap();
 		connection.stream.shutdown(std::net::Shutdown::Both).unwrap();
 	}

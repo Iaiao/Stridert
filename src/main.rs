@@ -17,6 +17,6 @@ lazy_static! {
 }
 
 fn main() {
-    network::tcp_listener::start("0.0.0.0", 25565, (*SERVER).clone()).expect("Не получилось запустить слушатель TCP");
+    network::tcp_listener::start("0.0.0.0", 25565).expect("Не получилось запустить слушатель TCP");
     println!("Started")
 }

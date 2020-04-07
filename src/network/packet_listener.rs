@@ -48,11 +48,13 @@ fn handle(player: Arc<Mutex<Player>>, buf: &mut friendlybytebuf::FriendlyByteBuf
 		}
 		0x05 => {
 			let packet = packets::serverboundclientsettingspacket::ServerboundClientSettingsPacket::deserialize(buf);
-			let mut player = player.lock().unwrap();
-			if packet.view_distance < player.get_view_distance() {
-				player.set_view_distance(if packet.view_distance >= 4 { packet.view_distance } else { 4 });
+			{
+				let mut p = player.lock().unwrap();
+				if packet.view_distance < p.get_view_distance() {
+					p.set_view_distance(if packet.view_distance >= 4 { packet.view_distance } else { 4 });
+				}
 			}
-			packet.handle(&mut player);
+			packet.handle(player.clone());
 		}
 		_ => {}
 	}
