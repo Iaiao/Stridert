@@ -101,6 +101,14 @@ impl ClientboundPlayerInfoPacket {
 			}).collect()
 		}
 	}
+	pub fn add_player(&mut self, player: &Player) {
+		self.players.push(PlayerData {
+			name: player.get_name(),
+			uuid: player.get_uuid().clone(),
+			gamemode: player.get_gamemode(),
+			properties: player.get_properties().clone()
+		})
+	}
 }
 
 pub enum Action {

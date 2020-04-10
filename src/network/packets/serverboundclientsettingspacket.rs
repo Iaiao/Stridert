@@ -1,9 +1,6 @@
-use crate::network::packets::{self, packet::{Packet, ServerboundPacket}, friendlybytebuf::FriendlyByteBuf};
+use crate::network::packets::{packet::{Packet, ServerboundPacket}, friendlybytebuf::FriendlyByteBuf};
 use crate::registry::{chatmodes::ChatMode, hands::Hand};
 use crate::entity::player::Player;
-use crate::SERVER;
-use crate::registry::entitystatuses;
-use std::sync::{Arc, Mutex};
 
 pub struct ServerboundClientSettingsPacket {
 	locale: String,
@@ -52,72 +49,9 @@ impl ServerboundPacket for ServerboundClientSettingsPacket {
 }
 
 impl ServerboundClientSettingsPacket {
-	pub fn handle(&self, player: Arc<Mutex<Player>>) {
-		{
-			let p = player.lock().unwrap();
-			let mut connection = p.connection.lock().unwrap();
-			
-			connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
-			connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
-			connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
-			let entity_id = p.get_entity().get_id();
-			connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
-			connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
-			let recipes = (*SERVER).lock().unwrap().get_recipes();
-			connection.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(
-				packets::clientboundunlockrecipespacket::Action::Init,
-				true,
-				true,
-				true,
-				true,
-				recipes.clone(),
-				Option::from(recipes)
-			));
-			connection.send(&packets::clientboundplayerpositionandlookpacket::ClientboundPlayerPositionPacket::new(
-				p.get_x(),
-				p.get_y(),
-				p.get_z(),
-				p.get_yaw(),
-				p.get_pitch(),
-				false,
-				false,
-				false,
-				false,
-				false
-			));
-			let mut players = (*crate::SERVER).lock().unwrap().get_players();
-			players.retain(|p| {
-				match p.try_lock() {
-					Ok(_) => true,
-					_ => false
-				}
-			});
-
-			connection.send(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
-				packets::clientboundplayerinfopacket::Action::AddPlayer,
-				players
-			));
-		}
-		(*crate::SERVER).lock().unwrap().broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
-			packets::clientboundplayerinfopacket::Action::AddPlayer,
-			vec!(player.clone())
-		));
-		(*crate::SERVER).lock().unwrap().broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
-			packets::clientboundplayerinfopacket::Action::UpdateLatency,
-			vec!(player.clone())
-		));
-		{
-			let p = player.lock().unwrap();
-			let mut connection = p.connection.lock().unwrap();
-			
-			connection.send(&packets::clientboundupdateviewpositionpacket::ClientboundUpdateViewPositionPacket::new(p.get_x(), p.get_z()));
-			let chunk_x = p.get_x() as i32 >> 4;
-			let chunk_z = p.get_z() as i32 >> 4;
-			for x in (chunk_x - p.get_view_distance() as i32)..(chunk_x - p.get_view_distance() as i32 + 1) {
-				for z in (chunk_z - p.get_view_distance() as i32)..(chunk_z - p.get_view_distance() as i32 + 1) {
-					connection.send(&packets::clientboundupdatelightpacket::ClientboundUpdateLightPacket::new(p.get_world().unwrap().lock().unwrap().get_chunk(x, z), (0..17).collect(), (0..17).collect()))
-				}
-			}
+	pub fn handle(&self, player: &mut Player) {
+		if self.view_distance < player.get_view_distance() {
+			player.set_view_distance(if self.view_distance >= 4 { self.view_distance } else { 4 });
 		}
 	}
 }

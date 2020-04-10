@@ -83,6 +83,10 @@ impl Player {
 		}
 		return None;
 	}
+	pub fn disconnect(&self) {
+		println!("[-] {} вышел из игры.", self.get_name());
+		// self.connection.lock().unwrap().send(disconnect)
+	}
 }
 
 impl PartialEq<Player> for Player {

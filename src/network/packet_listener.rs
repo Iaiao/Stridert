@@ -54,7 +54,7 @@ fn handle(player: Arc<Mutex<Player>>, buf: &mut friendlybytebuf::FriendlyByteBuf
 					p.set_view_distance(if packet.view_distance >= 4 { packet.view_distance } else { 4 });
 				}
 			}
-			packet.handle(player.clone());
+			packet.handle(&mut player.clone().lock().unwrap());
 		}
 		_ => {}
 	}

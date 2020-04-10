@@ -6,6 +6,7 @@ use crate::registry::{dimensions::Dimension, difficulties::Difficulty, identifie
 use crate::network::{self, packets};
 use crate::inventory::recipe::Recipe;
 use crate::registry::recipes;
+use crate::registry::entitystatuses;
 use std::fs;
 use std::sync::{Arc, Mutex};
 
@@ -72,30 +73,89 @@ impl Stridert {
 	pub fn get_icon(&self) -> String { self.icon.clone() }
 	pub fn add_player(&mut self, player: Player) {
 		let player = Arc::new(Mutex::new(player));
-		let mut world = self.worlds[0].lock().unwrap();
+		{
+			let p = player.lock().unwrap();
+			let mut conn = p.connection.lock().unwrap();
+			let world = self.worlds[0].lock().unwrap();
+			conn.send(&packets::clientboundloginsuccesspacket::ClientboundLoginSuccessPacket::new(
+				p.get_name(),
+				p.get_uuid()
+			));
+			println!("[+] {} присоединился к игре.", p.get_name());
+			conn.send(&packets::clientboundjoingamepacket::ClientboundJoinGamePacket::new(
+				p.get_id(),
+				p.get_gamemode(),
+				world.is_hardcore(),
+				world.get_dimension(),
+				world.get_seed(),
+				self.max_players as u8,
+				world.get_type(),
+				self.view_distance as i32,
+				false,
+				true
+			));
+			conn.send(&packets::clientboundpluginmessagepacket::ClientboundPluginMessagePacket::new(Identifier::new(String::from("minecraft"), String::from("brand")), self.get_mod_name().into_bytes()));
+			conn.send(&packets::clientboundserverdifficultypacket::ClientboundServerDifficultyPacket::new(world.get_difficulty(), true));
+			conn.send(&packets::clientboundplayerabilitiespacket::ClientboundPlayerAbilitiesPacket::new(true, true, true, true, 0.05, 0.1));
+
+			conn.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
+			conn.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new(self.get_recipes()));
+			conn.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
+			let entity_id = p.get_entity().get_id();
+			conn.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
+			conn.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
+			let recipes = self.get_recipes();
+			conn.send(&packets::clientboundunlockrecipespacket::ClientboundUnlockRecipesPacket::new(
+				packets::clientboundunlockrecipespacket::Action::Init,
+				true,
+				true,
+				true,
+				true,
+				recipes.clone(),
+				Option::from(recipes)
+			));
+			conn.send(&packets::clientboundplayerpositionandlookpacket::ClientboundPlayerPositionPacket::new(
+				p.get_x(),
+				p.get_y(),
+				p.get_z(),
+				p.get_yaw(),
+				p.get_pitch(),
+				false,
+				false,
+				false,
+				false,
+				false
+			));
+		}
+
+		let mut player_info_packet = packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
+			packets::clientboundplayerinfopacket::Action::AddPlayer,
+			self.get_players()
+		);
+		player_info_packet.add_player(&player.lock().unwrap());
+		player.lock().unwrap().connection.lock().unwrap().send(&player_info_packet);
+		
+		self.broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
+			packets::clientboundplayerinfopacket::Action::AddPlayer,
+			vec!(player.clone())
+		));
+		self.broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
+			packets::clientboundplayerinfopacket::Action::UpdateLatency,
+			vec!(player.clone())
+		));
+		
 		let p = player.lock().unwrap();
 		let mut conn = p.connection.lock().unwrap();
-		conn.send(&packets::clientboundloginsuccesspacket::ClientboundLoginSuccessPacket::new(
-			p.get_name(),
-			p.get_uuid()
-		));
-		println!("[+] {} присоединился к игре.", p.get_name());
-		conn.send(&packets::clientboundjoingamepacket::ClientboundJoinGamePacket::new(
-			p.get_id(),
-			p.get_gamemode(),
-			world.is_hardcore(),
-			world.get_dimension(),
-			world.get_seed(),
-			self.max_players as u8,
-			world.get_type(),
-			self.view_distance as i32,
-			false,
-			true
-		));
-		conn.send(&packets::clientboundpluginmessagepacket::ClientboundPluginMessagePacket::new(Identifier::new(String::from("minecraft"), String::from("brand")), self.get_mod_name().into_bytes()));
-		conn.send(&packets::clientboundserverdifficultypacket::ClientboundServerDifficultyPacket::new(world.get_difficulty(), true));
-		conn.send(&packets::clientboundplayerabilitiespacket::ClientboundPlayerAbilitiesPacket::new(true, true, true, true, 0.05, 0.1));
-		world.add_player(player.clone());
+		conn.send(&packets::clientboundupdateviewpositionpacket::ClientboundUpdateViewPositionPacket::new(p.get_x(), p.get_z()));
+		let chunk_x = p.get_x() as i32 >> 4;
+		let chunk_z = p.get_z() as i32 >> 4;
+		for x in (chunk_x - p.get_view_distance() as i32)..(chunk_x - p.get_view_distance() as i32 + 1) {
+
+			for z in (chunk_z - p.get_view_distance() as i32)..(chunk_z - p.get_view_distance() as i32 + 1) {
+				conn.send(&packets::clientboundupdatelightpacket::ClientboundUpdateLightPacket::new(self.worlds[0].lock().unwrap().get_chunk(x, z), (0..17).collect(), (0..17).collect()))
+			}
+		}
+		self.worlds[0].lock().unwrap().add_player(player.clone());
 		network::packet_listener::start(player.clone());
 	}
 	pub fn free_eid(&self) -> i32 {
