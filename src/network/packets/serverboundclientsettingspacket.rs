@@ -99,7 +99,11 @@ impl ServerboundClientSettingsPacket {
 		}
 		(*crate::SERVER).lock().unwrap().broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
 			packets::clientboundplayerinfopacket::Action::AddPlayer,
-			vec!(player)
+			vec!(player.clone())
+		));
+		(*crate::SERVER).lock().unwrap().broadcast_packet(&packets::clientboundplayerinfopacket::ClientboundPlayerInfoPacket::new(
+			packets::clientboundplayerinfopacket::Action::UpdateLatency,
+			vec!(player.clone())
 		));
 	}
 }
