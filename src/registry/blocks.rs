@@ -3,7 +3,7 @@
 use crate::world::block::Block;
 use crate::registry::identifier::Identifier;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Copy)]
 pub enum BlockType {
 	Air,
 	Stone,

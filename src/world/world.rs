@@ -1,6 +1,8 @@
 use crate::world::chunk::Chunk;
 use crate::entity::entity::Entity;
 use crate::entity::player::Player;
+use crate::world::block::Block;
+use crate::registry::blocks::BlockType;
 use crate::registry::{dimensions::Dimension, leveltypes::LevelType, difficulties::Difficulty};
 use std::sync::{Arc, Mutex};
 
@@ -47,5 +49,15 @@ impl World {
 			}
 		}
 		return None
+	}
+	pub fn get_loaded_chunks(&self) -> &Vec<Chunk> { &self.chunks }
+	pub fn get_chunk(&mut self, x: i32, z: i32) -> &Chunk {
+		if self.get_loaded_chunks().iter().any(|ch| ch.get_x() == x && ch.get_z() == z) {
+			return self.get_loaded_chunks().iter().filter(|ch| ch.get_x() == x && ch.get_z() == z).collect::<Vec<&Chunk>>()[0];
+		} else {
+			// Генерация или загрузка чанка
+			self.chunks.push(Chunk::new(x, z, [Block::new(BlockType::Air); 65536]));
+			return self.get_chunk(x, z);
+		}
 	}
 }

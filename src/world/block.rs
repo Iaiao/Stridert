@@ -1,11 +1,10 @@
 use crate::registry::blocks::BlockType;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Copy)]
 pub struct Block {
 	block_type: BlockType,
 	light: u8 // 0xf_f
 	//        sky -^|^- block
-	// nbt
 }
 
 impl Block {

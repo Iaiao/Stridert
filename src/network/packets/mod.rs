@@ -21,3 +21,4 @@ pub mod clientboundunlockrecipespacket;
 pub mod clientboundplayerpositionandlookpacket;
 pub mod clientboundplayerinfopacket;
 pub mod clientboundupdateviewpositionpacket;
+pub mod clientboundupdatelightpacket;

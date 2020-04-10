@@ -4,6 +4,7 @@ use crate::registry::entitytypes::EntityType;
 use crate::registry::gamemodes::GameMode;
 use crate::util::uuid;
 use crate::entity::property::Property;
+use crate::world::world::World;
 use serde::Deserialize;
 use reqwest::blocking::get;
 
@@ -72,6 +73,16 @@ impl Player {
 	pub fn set_view_distance(&mut self, view_distance: u8) { self.view_distance = view_distance }
 	pub fn get_view_distance(&self) -> u8 { self.view_distance }
 	pub fn get_properties(&self) -> &Vec<Property> { &self.properties }
+	pub fn get_world(&self) -> Option<Arc<Mutex<World>>> {
+		for world in (*crate::SERVER).lock().unwrap().get_worlds() {
+			for p in world.lock().unwrap().get_players() {
+				if &*p.lock().unwrap() == self {
+					return Some(world.clone());
+				}
+			}
+		}
+		return None;
+	}
 }
 
 impl PartialEq<Player> for Player {

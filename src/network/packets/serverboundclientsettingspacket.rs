@@ -111,6 +111,13 @@ impl ServerboundClientSettingsPacket {
 			let mut connection = p.connection.lock().unwrap();
 			
 			connection.send(&packets::clientboundupdateviewpositionpacket::ClientboundUpdateViewPositionPacket::new(p.get_x(), p.get_z()));
+			let chunk_x = p.get_x() as i32 >> 4;
+			let chunk_z = p.get_z() as i32 >> 4;
+			for x in (chunk_x - p.get_view_distance() as i32)..(chunk_x - p.get_view_distance() as i32 + 1) {
+				for z in (chunk_z - p.get_view_distance() as i32)..(chunk_z - p.get_view_distance() as i32 + 1) {
+					connection.send(&packets::clientboundupdatelightpacket::ClientboundUpdateLightPacket::new(p.get_world().unwrap().lock().unwrap().get_chunk(x, z), (0..17).collect(), (0..17).collect()))
+				}
+			}
 		}
 	}
 }
