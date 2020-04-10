@@ -56,10 +56,11 @@ impl ServerboundClientSettingsPacket {
 		{
 			let p = player.lock().unwrap();
 			let mut connection = p.connection.lock().unwrap();
-			let entity_id = p.get_entity().get_id();
+			
 			connection.send(&packets::clientboundhelditemchangepacket::ClientboundHeldItemChangePacket::new(0));
 			connection.send(&packets::clientbounddeclarerecipespacket::ClientboundDeclareRecipesPacket::new((*SERVER).lock().unwrap().get_recipes()));
 			connection.send(&packets::clientboundtagspacket::ClientboundTagsPacket::new());
+			let entity_id = p.get_entity().get_id();
 			connection.send(&packets::clientboundentitystatuspacket::ClientboundEntityStatusPacket::new(entity_id, entitystatuses::player::OP_PERMISSION_LEVEL_4));
 			connection.send(&packets::clientbounddeclarecommandspacket::ClientboundDeclareCommandsPacket::new());
 			let recipes = (*SERVER).lock().unwrap().get_recipes();
@@ -105,5 +106,11 @@ impl ServerboundClientSettingsPacket {
 			packets::clientboundplayerinfopacket::Action::UpdateLatency,
 			vec!(player.clone())
 		));
+		{
+			let p = player.lock().unwrap();
+			let mut connection = p.connection.lock().unwrap();
+			
+			connection.send(&packets::clientboundupdateviewpositionpacket::ClientboundUpdateViewPositionPacket::new(p.get_x(), p.get_z()));
+		}
 	}
 }
